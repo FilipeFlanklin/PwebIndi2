@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 const filePath = './livros.json';
 
 //ler o arquivo JSON
-function readBooksFromFile() {
+function LerArquivo() {
     try {
         const data = fs.readFileSync(filePath, 'utf8');
         const jsonData = JSON.parse(data);
@@ -20,7 +20,7 @@ function readBooksFromFile() {
 }
 
 //escrever no arquivo JSON
-function writeBooksToFile(books) {
+function EditarArquivo(books) {
     try {
         const jsonData = { books: books };
         fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2));
@@ -31,7 +31,7 @@ function writeBooksToFile(books) {
 
 // Listagem
 app.get('/livros', (req, res) => {
-    const books = readBooksFromFile();
+    const books = LerArquivo();
     res.json(books);
 });
 
@@ -42,7 +42,7 @@ app.post('/livros/comprar', (req, res) => {
         return res.status(400).send('Título do livro é obrigatório.');
     }
 
-    const books = readBooksFromFile();
+    const books = LerArquivo();
     console.log('Livros carregados:', books);
 
     if (!Array.isArray(books)) {
@@ -57,7 +57,7 @@ app.post('/livros/comprar', (req, res) => {
 
     if (book.exemplares > 0) {
         book.exemplares -= 1;
-        writeBooksToFile(books);
+        EditarArquivo(books);
         return res.status(200).send('Livro comprado com sucesso!');
     } else {
         return res.status(400).send('Livro não disponível.');
@@ -71,13 +71,13 @@ app.post('/livros/cadastro', (req, res) => {
         return res.status(400).send('Todos os campos são obrigatórios.');
     }
 
-    const books = readBooksFromFile();
+    const books = LerArquivo();
     if (!Array.isArray(books)) {
         return res.status(500).send('Erro ao ler os livros.');
     }
 
     books.push({ titulo, autor, genero, imagem, exemplares });
-    writeBooksToFile(books);
+    EditarArquivo(books);
     res.status(201).send('Livro cadastrado com sucesso!');
 });
 
